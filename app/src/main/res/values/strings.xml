@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Screw McDag</string>
+
+    <string name="Email">Email</string>
+    <string name="Password">Пароль</string>
+    <string name="PasswordCheck">Повторный пароль</string>
+    <string name="RealName">Имя</string>
+    <string name="signIn">Войти</string>
+    <string name="signUp">Регистрация</string>
+    <string name="Scores">Счета</string>
+    <string name="Details">Детали</string>
+    <string name="Messages">Сообщения</string>
+    <string name="Settings">Настройки</string>
+    <string name="SaveSettings">Применить изменения</string>
+    <string name="Add">Пополнить</string>
+    <string name="Payment">Платёж</string>
+    <string name="Transaction">Перевод</string>
+    <string name="History">История</string>
+    <string name="InsertHere">Наберите текст здесь…</string>
+    <string name="Close">Закрыть счёт</string>
+    <string name="showHist">Запрос</string>
+    <string name="ScoreNum">Номер получателя</string>
+    <string name="HowMuch">Сумма</string>
+    <string name="Acceptor">Email получателя</string>
+    <string name="StartDate">Дата от</string>
+    <string name="EndDate">Дата до</string>
+</resources>
