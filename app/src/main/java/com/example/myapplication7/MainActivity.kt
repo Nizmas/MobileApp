@@ -1,34 +1,39 @@
 package com.example.myapplication7
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.loader.content.CursorLoader
 import com.example.myapplication7.repository.Authorization
 import com.example.myapplication7.entities.AUTH_STATUS
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        @SuppressLint("SourceLockedOrientationActivity")
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         val msg = Observer<AUTH_STATUS> { msg ->
             println("from observer")
             var tostMessage =""
             when (msg) {
-                AUTH_STATUS.FAILED -> tostMessage ="Проверьте подключение к сети"
-                AUTH_STATUS.SUCCESS -> { tostMessage ="Добро пожаловать"
+                AUTH_STATUS.FAILED -> {Toast.makeText(this, "Проверьте подключение к сети", Toast.LENGTH_SHORT).show()
+                    Authorization.message.postValue(AUTH_STATUS.UNSIGNED)}
+                AUTH_STATUS.SUCCESS -> {Toast.makeText(this, "Добро пожаловать", Toast.LENGTH_SHORT).show()
                     val enterIntent = Intent(this, ScoresActivity::class.java) // создаём объект с описанием нового окна ява
-                    startActivity(enterIntent)}
-                AUTH_STATUS.INCORRECT -> tostMessage ="Некорретное имя пользователя или пароль"
+                    startActivity(enterIntent)
+                    Authorization.message.postValue(AUTH_STATUS.UNSIGNED)}
+                AUTH_STATUS.INCORRECT -> {Toast.makeText(this, "Некорретное имя пользователя или пароль", Toast.LENGTH_SHORT).show()
+                    Authorization.message.postValue(AUTH_STATUS.UNSIGNED)}
             }
-            Toast.makeText(this, tostMessage, Toast.LENGTH_LONG).show()
         }
         Authorization.message.observe(this, msg)
     }

@@ -19,6 +19,10 @@
     <string name="InsertHere">Наберите текст здесь…</string>
     <string name="Close">Закрыть счёт</string>
     <string name="showHist">Запрос</string>
+    <string name="Template">Шаблоны</string>
+    <string name="ToTemplate">В шаблоны</string>
+    <string name="TemplateName">Название</string>
+    <string name="Enter">Выполнить</string>
     <string name="ScoreNum">Номер получателя</string>
     <string name="HowMuch">Сумма</string>
     <string name="Acceptor">Email получателя</string>

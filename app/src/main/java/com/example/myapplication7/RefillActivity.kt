@@ -18,6 +18,10 @@ import kotlinx.android.synthetic.main.activity_payment.*
 
 class RefillActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (userInfo.token == "") {
+            val regIntent = Intent(this, MainActivity::class.java)
+            startActivity(regIntent)
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_payment)
 
@@ -28,18 +32,22 @@ class RefillActivity : AppCompatActivity() {
         inputTaker.visibility = View.GONE
         inputTo.visibility = View.GONE
         spinnerNums.visibility = View.GONE
+        switchTemplate.visibility = View.GONE
+        inputTemplate.visibility = View.GONE
 
         val msg = Observer<AUTH_STATUS> { msg ->
             println("from observer")
             when (msg) {
-                AUTH_STATUS.FAILED -> Toast.makeText(this, "Проверьте подключение к сети", Toast.LENGTH_LONG).show()
+                AUTH_STATUS.FAILED -> {Toast.makeText(this, "Проверьте подключение к сети", Toast.LENGTH_LONG).show()
+                    SenderMoney.message.postValue(AUTH_STATUS.UNSIGNED)}
                 AUTH_STATUS.SUCCESS -> {
                     val scoreBringer = Intent(this, ScoresActivity::class.java) // создаём объект с описанием нового окна ява
                     startActivity(scoreBringer)
                     Toast.makeText(this, "Выполнено", Toast.LENGTH_LONG).show()
                     SenderMoney.message.postValue(AUTH_STATUS.UNSIGNED)
                 }
-                AUTH_STATUS.INCORRECT -> Toast.makeText(this, "Что-то пошло не так...", Toast.LENGTH_LONG).show()
+                AUTH_STATUS.INCORRECT -> {Toast.makeText(this, "Что-то пошло не так...", Toast.LENGTH_LONG).show()
+                    SenderMoney.message.postValue(AUTH_STATUS.UNSIGNED)}
             }
         }
         SenderMoney.message.observe(this, msg)
@@ -50,6 +58,6 @@ class RefillActivity : AppCompatActivity() {
         var scoreTo = setOnSelect.selectedNum
         var takerName = userInfo.email
         var howMuch = inputHowMuch.text.toString()
-        SenderMoney.startSending(scoreFrom, scoreTo, takerName, howMuch)
+        SenderMoney.startSending(scoreFrom, scoreTo, takerName, howMuch, "false")
     }
 }

@@ -2,6 +2,7 @@ package com.example.myapplication7
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication7.entities.AUTH_STATUS
 import com.example.myapplication7.present.HistoryAdapter
 import com.example.myapplication7.present.setOnSelect
+import com.example.myapplication7.repository.Authorization
 import com.example.myapplication7.repository.TakeHistory
 import kotlinx.android.synthetic.main.activity_history.*
 import java.text.SimpleDateFormat
@@ -25,6 +27,10 @@ class HistoryActivity : AppCompatActivity() {
     var endDate = String()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (Authorization.userInfo.token == "") {
+            val regIntent = Intent(this, MainActivity::class.java)
+            startActivity(regIntent)
+        }
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)
@@ -33,7 +39,7 @@ class HistoryActivity : AppCompatActivity() {
             println("from observer")
             when (msg) {
                 AUTH_STATUS.FAILED -> { Toast.makeText(this, "Проверьте подключение к сети", Toast.LENGTH_LONG).show()
-                    AUTH_STATUS.UNSIGNED}
+                    TakeHistory.message.postValue(AUTH_STATUS.UNSIGNED)}
 
                 AUTH_STATUS.SUCCESS -> { Toast.makeText(this, "Jr", Toast.LENGTH_LONG).show()
                     viewManager = LinearLayoutManager(this)
@@ -44,10 +50,10 @@ class HistoryActivity : AppCompatActivity() {
                         layoutManager = viewManager
                         adapter = viewAdapter
                     }
-                    AUTH_STATUS.UNSIGNED
+                    TakeHistory.message.postValue(AUTH_STATUS.UNSIGNED)
                 }
                 AUTH_STATUS.INCORRECT -> { Toast.makeText(this, "Что-то пошло не так...", Toast.LENGTH_LONG).show()
-                    AUTH_STATUS.UNSIGNED}
+                    TakeHistory.message.postValue(AUTH_STATUS.UNSIGNED)}
             }
         }
         TakeHistory.message.observe(this, msg)

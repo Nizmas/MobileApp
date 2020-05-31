@@ -10,22 +10,22 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 
-object SenderMoney {
+object SenderTemplate {
     val message: MutableLiveData<AUTH_STATUS> by lazy {
         MutableLiveData<AUTH_STATUS>()
     }
 
-    public fun startSending(scoreFrom: String, scoreTo: String, takerName: String, howMuch: String, isTemplate: String) {
+    public fun startSending(templateName: String, scoreFrom: String, scoreTo: String, takerName: String, howMuch: String) {
         println("###################### startSending has been launched ##############################")
         val okHttpClient = OkHttpClient()
-        val payload = "{\"ScoreFrom\":\"$scoreFrom\", \"ScoreTo\":\"$scoreTo\", \"TakerName\":\"$takerName\", \"HowMuch\":$howMuch, \"IsTemplate\":\"$isTemplate\"}"
+        val payload = "{\"templateName\":\"$templateName\", \"ScoreFrom\":\"$scoreFrom\", \"ScoreTo\":\"$scoreTo\", \"TakerName\":\"$takerName\", \"HowMuch\":$howMuch}"
         println(payload)
 
         val body: RequestBody =
             payload.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
 
         val request = Request.Builder()
-            .url("http://10.0.2.2:5000/transfermoney")
+            .url("http://10.0.2.2:5000/newtemplate")
             .addHeader("Authorization", "Bearer " + Authorization.userInfo.token)
             .post(body)
             .build()
@@ -39,9 +39,9 @@ object SenderMoney {
                 println("Response!!!!")
                 if (response.code ==200){
                     message.postValue(AUTH_STATUS.SUCCESS)
-                    //println("Everything is goo")
+                    println("Everything is goo")
                 } else {
-                    //println("Everything is mad")
+                    println("Everything is mad")
                     message.postValue(AUTH_STATUS.INCORRECT)
                 }
             }

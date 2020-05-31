@@ -35,15 +35,17 @@ class HistoryAdapter(private val histories: List<HistoryBox>) :
         position: Int
     ) {
         val history = histories[position]
+        var bodyString = ""
 
         if (history.type == "Пополнение") {
             holder.frameView.setBackgroundColor(Color.parseColor("#D8F6CE"))
-        }
+            bodyString = "Счёта " + history.scoreTo
+        } else bodyString = "c " + history.scoreFrom + " на " + history.scoreTo
 
         var dateString = history.sentTime.toString()
-        var typeString = history.type
-        if (history.byTemplate) typeString = typeString + "По шаблону"
-        var bodyString = "c " + history.scoreFrom + " на " + history.scoreTo + " " + history.howMuch + " ₽"
+        var typeString = history.type + " " + history.howMuch + " ₽"
+        if (history.byTemplate) typeString = typeString + " По шаблону"
+
 
         holder.dateView.text = dateString
         holder.typeView.text = typeString

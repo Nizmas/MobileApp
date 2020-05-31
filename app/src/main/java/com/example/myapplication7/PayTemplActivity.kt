@@ -1,38 +1,58 @@
 package com.example.myapplication7
 
+import android.R
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
+import android.widget.EditText
 import android.widget.Switch
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.example.myapplication7.entities.AUTH_STATUS
+import com.example.myapplication7.present.selectedTempl
 import com.example.myapplication7.present.setOnSelect
 import com.example.myapplication7.repository.Authorization
 import com.example.myapplication7.repository.SenderMoney
 import com.example.myapplication7.repository.SenderTemplate
 import kotlinx.android.synthetic.main.activity_payment.*
+import kotlin.math.roundToInt
 
-class PaymentActivity : AppCompatActivity() {
+
+class PayTemplActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         if (Authorization.userInfo.token == "") {
             val regIntent = Intent(this, MainActivity::class.java)
             startActivity(regIntent)
         }
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_payment)
+        setContentView(com.example.myapplication7.R.layout.activity_payment)
 
         @SuppressLint("SourceLockedOrientationActivity")
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        scoreView.text = setOnSelect.selectedNum
-        amountView.text = setOnSelect.selectedAmount  + " ₽"
+        textDetails.text = "Шаблон " + selectedTempl.templateName
+        scoreView.text = selectedTempl.scoreFrom
+        inputHowMuch.hint = selectedTempl.howMuch.toString()
+
+        amountView.visibility = View.GONE
         spinnerNums.visibility = View.GONE
-        buttonAdd.setOnClickListener {paymentMoney()}
+        inputTemplate.visibility = View.GONE
+        switchTemplate.visibility = View.GONE
+
+        val viewTo = findViewById(com.example.myapplication7.R.id.inputTo) as TextView
+        val viewMail = findViewById(com.example.myapplication7.R.id.inputTaker) as TextView
+        viewTo.isEnabled = false
+        viewMail.isEnabled = false
+        viewTo.text = selectedTempl.scoreTo
+        viewMail.text = selectedTempl.takerName
+
+        buttonAdd.setOnClickListener {payTemplate()}
 
         val msg = Observer<AUTH_STATUS> { msg ->
             println("from observer")
@@ -52,32 +72,13 @@ class PaymentActivity : AppCompatActivity() {
         SenderMoney.message.observe(this, msg)
     }
 
-    fun paymentMoney () {
-        var scoreFrom = setOnSelect.selectedNum
-        var scoreTo = inputTo.text.toString()
-        var takerName = inputTaker.text.toString()
+    fun payTemplate () {
+        var scoreFrom = selectedTempl.scoreFrom
+        var scoreTo = selectedTempl.scoreTo
+        var takerName = selectedTempl.takerName
         var howMuch = inputHowMuch.text.toString()
-        var tempName = inputTemplate.text.toString()
 
-        fun String.isEmailValid(): Boolean { //проверка на почтовость
-            return !TextUtils.isEmpty(this) && android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
-        }
-
-        var e: Boolean = true
-        when (e) {
-            (howMuch == "") -> Toast.makeText(this, "Укажите сумму", Toast.LENGTH_LONG).show()
-            (howMuch.toDouble() > setOnSelect.selectedAmount.toDouble()) -> Toast.makeText(this, "Недостаточно средств на счёте", Toast.LENGTH_LONG).show()
-            (scoreTo.length != 10) -> Toast.makeText(this, "Укажите десятизначный номер", Toast.LENGTH_LONG).show()
-            (!takerName.isEmailValid()) -> Toast.makeText(this, "Введите почтовый адрес", Toast.LENGTH_LONG).show()
-            else -> e = false
-        }
-
-        if (!e) {
-            SenderMoney.startSending(scoreFrom, scoreTo, takerName, howMuch, "false")
-        }
-
-        val switch: Switch = findViewById(R.id.switchTemplate)
-        if (switch.isChecked) SenderTemplate.startSending(tempName, scoreFrom, scoreTo, takerName, howMuch)
+        SenderMoney.startSending(scoreFrom, scoreTo, takerName, howMuch, "true")
     }
 
 }

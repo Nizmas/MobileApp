@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication7.entities.AUTH_STATUS
 import com.example.myapplication7.repository.CreateScore
 import com.example.myapplication7.present.ScoreAdapter
+import com.example.myapplication7.repository.Authorization.userInfo
 import com.example.myapplication7.repository.Scores
 import com.example.myapplication7.repository.Scores.scoreData
 import com.example.myapplication7.repository.Scores.scoresShow
@@ -25,6 +26,11 @@ class ScoresActivity  : AppCompatActivity() {
         setContentView(R.layout.activity_scores)
 
         scoresShow()
+
+        if (userInfo.token == "") {
+            val regIntent = Intent(this, MainActivity::class.java)
+            startActivity(regIntent)
+        }
 
         val msg = Observer<AUTH_STATUS> { msg ->
             println("from observer")
@@ -54,16 +60,17 @@ class ScoresActivity  : AppCompatActivity() {
         val msg = Observer<AUTH_STATUS> { msg ->
             println("from observer")
             when (msg) {
-                AUTH_STATUS.FAILED -> Toast.makeText(this, "Проверьте подключение к сети", Toast.LENGTH_LONG).show()
+                AUTH_STATUS.FAILED -> {Toast.makeText(this, "Проверьте подключение к сети", Toast.LENGTH_LONG).show()
+                    CreateScore.message.postValue(AUTH_STATUS.UNSIGNED)}
                 AUTH_STATUS.SUCCESS -> {
                     Toast.makeText(this, "Счёт открыт", Toast.LENGTH_SHORT).show()
                     scoresShow()
                     recyclerView.getRecycledViewPool().clear()
-                    AUTH_STATUS.UNSIGNED
+                    CreateScore.message.postValue(AUTH_STATUS.UNSIGNED)
                 }
                 AUTH_STATUS.INCORRECT -> {
                     Toast.makeText(this, "Обратитесь к модератору...", Toast.LENGTH_LONG).show()
-                    AUTH_STATUS.UNSIGNED}
+                    CreateScore.message.postValue(AUTH_STATUS.UNSIGNED)}
             }
         }
         CreateScore.message.observe(this, msg)
@@ -76,6 +83,17 @@ class ScoresActivity  : AppCompatActivity() {
 
     fun openSettings (view: View) {
         val regIntent = Intent(this, SettingsActivity::class.java)
+        startActivity(regIntent)
+    }
+
+    fun openTemplates (view: View) {
+        val regIntent = Intent(this, TemplateActivity::class.java)
+        startActivity(regIntent)
+    }
+
+    fun exitUser (view: View) {
+        userInfo.token = ""
+        val regIntent = Intent(this, MainActivity::class.java)
         startActivity(regIntent)
     }
 }

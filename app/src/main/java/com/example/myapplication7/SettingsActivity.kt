@@ -1,18 +1,25 @@
 package com.example.myapplication7
 
+import android.app.PendingIntent.getActivity
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.text.TextUtils
-import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.example.myapplication7.entities.AUTH_STATUS
+import com.example.myapplication7.repository.Authorization
 import com.example.myapplication7.repository.SaveSettings
 import kotlinx.android.synthetic.main.activity_registration.*
 
+
 class SettingsActivity  : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (Authorization.userInfo.token == "") {
+            val regIntent = Intent(this, MainActivity::class.java)
+            startActivity(regIntent)
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
         textRegistration.text= "Настройка"
@@ -24,13 +31,13 @@ class SettingsActivity  : AppCompatActivity() {
             var tostMessage =""
             when (msg) {
                 AUTH_STATUS.FAILED -> {tostMessage ="Проверьте подключение к сети"
-                    AUTH_STATUS.UNSIGNED}
+                    SaveSettings.message.postValue(AUTH_STATUS.UNSIGNED)}
                 AUTH_STATUS.SUCCESS -> {tostMessage ="Изменения успешно сохранены"
                     val homeBringer = Intent(this, ScoresActivity::class.java) // создаём объект с описанием нового окна ява
                     startActivity(homeBringer)
                     SaveSettings.message.postValue(AUTH_STATUS.UNSIGNED)}
                 AUTH_STATUS.INCORRECT -> {tostMessage ="Этот адрес уже зарегистрирован"
-                    AUTH_STATUS.UNSIGNED}
+                    SaveSettings.message.postValue(AUTH_STATUS.UNSIGNED)}
             }
             Toast.makeText(this, tostMessage, Toast.LENGTH_LONG).show()
         }

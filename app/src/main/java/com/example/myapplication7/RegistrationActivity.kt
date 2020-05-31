@@ -17,19 +17,18 @@ class RegistrationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
         val msg = Observer<AUTH_STATUS> { msg ->
-            // Update the UI, in this case, a TextView.
             println("from observer")
             var tostMessage =""
             when (msg) {
                 AUTH_STATUS.FAILED -> {tostMessage ="Проверьте подключение к сети"
-                    AUTH_STATUS.UNSIGNED}
+                    Registration.message.postValue(AUTH_STATUS.UNSIGNED)}
                 AUTH_STATUS.SUCCESS -> {tostMessage ="Заявка отправлена модератору!"
                     val homeBringer = Intent(this, MainActivity::class.java) // создаём объект с описанием нового окна ява
                     startActivity(homeBringer)
                     Registration.message.postValue(AUTH_STATUS.UNSIGNED)
                     }
                 AUTH_STATUS.INCORRECT -> {tostMessage ="Этот адрес уже зарегистрирован"
-                    AUTH_STATUS.UNSIGNED}
+                    Registration.message.postValue(AUTH_STATUS.UNSIGNED)}
             }
             Toast.makeText(this, tostMessage, Toast.LENGTH_LONG).show()
         }

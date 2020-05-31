@@ -2,6 +2,7 @@ package com.example.myapplication7
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -16,9 +17,16 @@ import kotlinx.android.synthetic.main.activity_elements.*
 
 class ElementsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (Authorization.userInfo.token == "") {
+            val regIntent = Intent(this, MainActivity::class.java)
+            startActivity(regIntent)
+        }
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_elements)
+
+        @SuppressLint("SourceLockedOrientationActivity")
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         scoreView.text = setOnSelect.selectedNum
         amountView.text = setOnSelect.selectedAmount + " ₽"
@@ -56,11 +64,14 @@ class ElementsActivity : AppCompatActivity() {
             println("from observer")
             var tostMessage =""
             when (msg) {
-                AUTH_STATUS.FAILED -> tostMessage ="Проверьте подключение к сети"
+                AUTH_STATUS.FAILED -> {tostMessage ="Проверьте подключение к сети"
+                AUTH_STATUS.UNSIGNED}
                 AUTH_STATUS.SUCCESS -> { tostMessage ="Счёт успешно закрыт"
                     val enterIntent = Intent(this, ScoresActivity::class.java) // создаём объект с описанием нового окна ява
-                    startActivity(enterIntent)}
-                AUTH_STATUS.INCORRECT -> tostMessage ="Повторите вход"
+                    startActivity(enterIntent)
+                    AUTH_STATUS.UNSIGNED}
+                AUTH_STATUS.INCORRECT -> {tostMessage ="Повторите вход"
+                    AUTH_STATUS.UNSIGNED}
             }
             Toast.makeText(this, tostMessage, Toast.LENGTH_LONG).show()
         }
